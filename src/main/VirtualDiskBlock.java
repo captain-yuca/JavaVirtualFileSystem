@@ -1,4 +1,5 @@
 package main;
+import exceptions.*;
 
 public class VirtualDiskBlock {
 	/*
