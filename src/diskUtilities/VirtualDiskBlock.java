@@ -1,4 +1,4 @@
-package main;
+package diskUtilities;
 
 /**
  * The Class VirtualDiskBlock is a virtual representation of a physical disk block. 

@@ -1,4 +1,4 @@
-package main;
+package diskUtilities;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -45,17 +45,14 @@ public class DiskUnit {
 	 * instance does not match the block size of the current disk instance)
 	 */
 	public void write(int blockNum, VirtualDiskBlock b) throws InvalidBlockNumberException, InvalidBlockException{
-		int offset = blockNum*this.getBlockSize()+RESERVED_SPACE;
+		int offset = blockNum*this.getBlockSize();
 		try {
 			this.disk.seek(offset);
 		} catch (IOException e1) {
 			throw new InvalidBlockNumberException();
 		}
 		try {
-			for(int i=0; i<this.getBlockSize();i++){
-				this.disk.seek(offset+i);
-				this.disk.write(b.getElement(i));	
-			}
+			this.disk.write(b.elements);
 		} catch (IOException e) {
 			throw new InvalidBlockException();
 		}
@@ -79,7 +76,7 @@ public class DiskUnit {
 	 * instance does not match the block size of the current disk instance)
 	 */
 	public void read(int blockNum, VirtualDiskBlock b) throws InvalidBlockNumberException, InvalidBlockException{
-		int offset = blockNum*this.getBlockSize()+RESERVED_SPACE;
+		int offset = blockNum*this.getBlockSize();
 
 		try {
 			for(int i=0; i<this.getBlockSize(); i++){
@@ -135,7 +132,7 @@ public class DiskUnit {
 		
 		//Only creating VirtualDiskBlock without any initialization since default value for the elements are 0
 		VirtualDiskBlock formatDiskBlock = new VirtualDiskBlock(this.blockSize);
-		for(int i=0; i<this.capacity; i++){
+		for(int i=1; i<this.capacity; i++){
 			this.write(i, formatDiskBlock);
 		}
 	}

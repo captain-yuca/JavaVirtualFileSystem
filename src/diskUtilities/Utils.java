@@ -1,4 +1,4 @@
-package main;
+package diskUtilities;
 
 /**
  * The Class Utils is a utilities class made for this project.

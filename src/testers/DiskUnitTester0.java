@@ -1,6 +1,8 @@
 package testers;
+
+import diskUtilities.DiskUnit;
+import diskUtilities.VirtualDiskBlock;
 import exceptions.NonExistingDiskException;
-import main.*;
 
 public class DiskUnitTester0 {
 
@@ -113,5 +115,4 @@ public class DiskUnitTester0 {
 	}
 
 }
-
 

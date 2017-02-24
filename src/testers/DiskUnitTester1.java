@@ -1,6 +1,6 @@
 package testers;
+import diskUtilities.*;
 import exceptions.NonExistingDiskException;
-import main.*;
 public class DiskUnitTester1 {
 
 	/**
@@ -8,7 +8,7 @@ public class DiskUnitTester1 {
 	 * @throws NonExistingDiskException 
 	 */
 	public static void main(String[] args) throws NonExistingDiskException {
-		DiskUnit d = DiskUnit.mount("disk4"); // edit the name of the disk to mount
+		DiskUnit d = DiskUnit.mount("disk1"); // edit the name of the disk to mount
 		
 	    showDiskContent(d); 
 		
@@ -81,5 +81,6 @@ public class DiskUnitTester1 {
 	}
 
 }
+
 
 
