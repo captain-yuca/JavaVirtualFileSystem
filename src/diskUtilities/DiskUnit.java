@@ -14,14 +14,40 @@ import exceptions.*;
  * @author Manuel A. Baez Gonzalez
  */
 public class DiskUnit {
-	private int capacity;
-	private int blockSize;
-	public RandomAccessFile disk;
-	private final static int DEFAULT_CAPACITY = 1024;  // default number of blocks 	
-	private final static int DEFAULT_BLOCK_SIZE = 256; // default number of bytes per block
-	private final static int RESERVED_SPACE = 8; //reserved space for capacity and block size fields. 8 due to 4(int) + 4(int) 
-
+	/**
+	 * Number of VirtualDiskBlocks
+	 */
+	private int capacity; 
 	
+	/**
+	 * Number of bytes per block
+	 */
+	private int blockSize; 
+	
+	/**
+	 * The Random Access File that represents the disk
+	 */
+	public RandomAccessFile disk;
+	
+	/**
+	 * Default number of blocks
+	 */
+	private final static int DEFAULT_CAPACITY = 1024; 
+	
+	/**
+	 * Default number of bytes per block
+	 */
+	private final static int DEFAULT_BLOCK_SIZE = 256;
+	
+	/**
+	 * Reserved space for capacity and block size fields. 8 due to 4(int) + 4(int) 
+	 */
+	private final static int RESERVED_SPACE = 8;
+
+	/**
+	 * Private constructor for DiskUnit
+	 * @param name Name for the RAF that will be created for the DiskUnit
+	 */
 	private DiskUnit(String name) {
 		try {
 			disk = new RandomAccessFile(name, "rw");
@@ -61,7 +87,7 @@ public class DiskUnit {
 
 	/**
 	 * Reads a given block from the disk. The content of the specified 
-	 * disk block (identified by its number – blockNum) is copied as the 
+	 * disk block (identified by its number ï¿½ blockNum) is copied as the 
 	 * new content of the current instance of block being referenced by parameter b. 
 	 * Notice that b must reference an existing instance of VirtualDiskBlock, 
 	 * and that the current content of that instance shall be overwritten by the 
@@ -124,7 +150,7 @@ public class DiskUnit {
 	}
 
 	/** 
-	 * Formats the disk. This operation visits every “physical block” 
+	 * Formats the disk. This operation visits every ï¿½physical blockï¿½ 
 	 * in the disk and fills with zeroes all those that are valid
 	 **/
 	public void lowLevelFormat(){
@@ -157,7 +183,7 @@ public class DiskUnit {
 	 * @param name the name of the disk unit to activate
 	 * @return the corresponding DiskUnit object
 	 * @throws NonExistingDiskException whenever no
-	 *    ¨disk¨ with the specified name is found.
+	 *    ï¿½diskï¿½ with the specified name is found.
 	 */
 	public static DiskUnit mount(String name)
 			throws NonExistingDiskException

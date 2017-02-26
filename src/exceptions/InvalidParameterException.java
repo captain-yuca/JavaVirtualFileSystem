@@ -1,30 +1,29 @@
 package exceptions;
 
+/**
+ * Exception created for errors regarding whenever the values for capacity
+ * or blockSize are not valid according to the specifications 
+ * 
+ * 
+ * @author Manuel A. Baez Gonzalez
+ */
 public class InvalidParameterException extends RuntimeException {
-
+	
+	/**
+	 * Constructor for InvalidParameterException
+	 * 
+	 */
 	public InvalidParameterException() {
-		// TODO Auto-generated constructor stub
 	}
-
+	
+	/**
+	 * Constructor for InvalidParameterException with a message
+	 * 
+	 * @param message Message that you want to show when the exception is thrown
+	 */
 	public InvalidParameterException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
 	}
 
-	public InvalidParameterException(Throwable cause) {
-		super(cause);
-		// TODO Auto-generated constructor stub
-	}
-
-	public InvalidParameterException(String message, Throwable cause) {
-		super(message, cause);
-		// TODO Auto-generated constructor stub
-	}
-
-	public InvalidParameterException(String message, Throwable cause, boolean enableSuppression,
-			boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-		// TODO Auto-generated constructor stub
-	}
 
 }

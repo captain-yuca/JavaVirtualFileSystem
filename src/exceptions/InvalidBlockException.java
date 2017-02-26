@@ -1,25 +1,27 @@
 package exceptions;
 
+/**
+ * Exception created for invalid VirtualDiskBlock instances. 
+ * 
+ * 
+ * @author Manuel A. Baez Gonzalez
+ */
 public class InvalidBlockException extends RuntimeException {
-
+	
+	/**
+	 * Constructor for InvalidBlockException
+	 * 
+	 */
 	public InvalidBlockException() {
-		// TODO Auto-generated constructor stub
 	}
-
+	
+	/**
+	 * Constructor for InvalidBlockException with a message
+	 * 
+	 * @param message Message that you want to show when the exception is thrown
+	 */
 	public InvalidBlockException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
 	}
-
-	public InvalidBlockException(Throwable cause) {
-		super(cause);
-		// TODO Auto-generated constructor stub
-	}
-
-	public InvalidBlockException(String message, Throwable cause) {
-		super(message, cause);
-		// TODO Auto-generated constructor stub
-	}
-
 
 }

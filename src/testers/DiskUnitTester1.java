@@ -4,6 +4,7 @@ import exceptions.NonExistingDiskException;
 public class DiskUnitTester1 {
 
 	/**
+	 * Main method for tester
 	 * @param args
 	 * @throws NonExistingDiskException 
 	 */
@@ -16,7 +17,10 @@ public class DiskUnitTester1 {
 		d.shutdown(); 
 	}
 
-		
+	/**
+	 * Shows all the content beginning from block 1
+	 * @param d The Disk you want to show the content from
+	 */
 	private static void showFileInDiskContent(DiskUnit d) { 
 		VirtualDiskBlock vdb = new VirtualDiskBlock(d.getBlockSize()); 
 		
@@ -30,7 +34,10 @@ public class DiskUnitTester1 {
 		
 	}
 
-	
+	/**
+	 * Shows all the DiskUnits content
+	 * @param d The DiskUnit desired to show it's content
+	 */
 	private static void showDiskContent(DiskUnit d) { 
 		
 		System.out.println("Capacity of disk is: " + d.getCapacity()); 
@@ -43,7 +50,12 @@ public class DiskUnitTester1 {
 		}
 		
 	}
-
+	
+	/**
+	 * Shows the desired block's content
+	 * @param b The position of the corresponding block according to the DiskUnit
+	 * @param block The VirtualDiskBlock you wish to read from
+	 */
 	private static void showVirtualDiskBlock(int b, VirtualDiskBlock block) {
 	    System.out.print(" Block "+ b + "\t"); 
 	    for (int i=0; i<block.getCapacity(); i++) {
@@ -55,8 +67,13 @@ public class DiskUnitTester1 {
 	    }
 	    System.out.println(); 
 	}
-
 	
+	
+	/**
+	 * Internal method to make sure string can be written completely on Disk
+	 * @param vdb The Virtual Disk Block you are working with
+	 * @param value The desired value to copy next
+	 */
 	public static void copyNextBNToBlock(VirtualDiskBlock vdb, int value) { 
 		int lastPos = vdb.getCapacity()-1;
 
@@ -66,7 +83,10 @@ public class DiskUnitTester1 {
 		}
 
 	}
-	
+	/**
+	 * Gets next block number
+	 * @param vdb The Virtual Disk Block you are working with
+	 */
 	private static int getNextBNFromBlock(VirtualDiskBlock vdb) { 
 		int bsize = vdb.getCapacity(); 
 		int value = 0; 

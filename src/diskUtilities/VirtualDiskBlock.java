@@ -8,17 +8,22 @@ package diskUtilities;
  * @author Manuel A. Baez Gonzalez
  */
 public class VirtualDiskBlock {
+	
+	/**
+	 * The bytes array (block)
+	 */
 	public byte[] elements;
 	
-	/*
-	 * creates a block of size equal to 256 bytes.
+	/**
+	 * Creates a block of size equal to 256 bytes.
 	 */
 	public VirtualDiskBlock(){
 		this.elements= new byte[256];
 	}
 	
-	/*
-	 * creates a block of size (number of bytes) equal to blockCapacity.
+	/**
+	 * Creates a block of size (number of bytes) equal to blockCapacity.
+	 * @param blockCapacity The desired number of bytes for the block.
 	 */
 	public VirtualDiskBlock(int blockCapacity){
 		this.elements= new byte[blockCapacity];

@@ -1,30 +1,27 @@
 package exceptions;
 
+/**
+ * Exception created for errors regarding the creation of an already existing DiskUnit. 
+ * 
+ * 
+ * @author Manuel A. Baez Gonzalez
+ */
 public class ExistingDiskException extends RuntimeException {
-
+	
+	/**
+	 * Constructor for ExistingDiskException
+	 * 
+	 */
 	public ExistingDiskException() {
-		// TODO Auto-generated constructor stub
 	}
-
+	
+	/**
+	 * Constructor for ExistingDiskException with a message
+	 * 
+	 * @param message Message that you want to show when the exception is thrown
+	 */
 	public ExistingDiskException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
-	}
-
-	public ExistingDiskException(Throwable cause) {
-		super(cause);
-		// TODO Auto-generated constructor stub
-	}
-
-	public ExistingDiskException(String message, Throwable cause) {
-		super(message, cause);
-		// TODO Auto-generated constructor stub
-	}
-
-	public ExistingDiskException(String message, Throwable cause, boolean enableSuppression,
-			boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-		// TODO Auto-generated constructor stub
 	}
 
 }

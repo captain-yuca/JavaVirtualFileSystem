@@ -7,6 +7,7 @@ import exceptions.NonExistingDiskException;
 public class DiskUnitTester0 {
 
 	/**
+	 * Main method for tester
 	 * @param args
 	 * @throws NonExistingDiskException 
 	 */
@@ -23,7 +24,7 @@ public class DiskUnitTester0 {
 		String s = "You can modify the testers to make them more user-friendly. The " +
 				"current versions of tester 1 and of tester 2 require some minor editing in" +
 				" order to use it on a particular disk wanted. Just edit (inside the main method) " +
-				"the line that ¨mounts¨ the particular disk that you want to use. Remember that " +
+				"the line that \".mounts.\" the particular disk that you want to use. Remember that " +
 				"tester 0 only creates the six disks mentioned above. Again, you can modify to " +
 				"create others or to make those testers easier to use. You should run tester 1 " +
 				"on a particular disk unit before running the tester 2 on that same unit. " +
@@ -38,7 +39,11 @@ public class DiskUnitTester0 {
 
 	}
 	
-	
+	/**
+	 * Splits and writes the string to a given disk Unit by splitting it onto different blocks
+	 * @param s String you wish to write
+	 * @param d DiskUnit you wish to write
+	 */
 	private static void splitAndWriteToDisk(String s, DiskUnit d) {
 		// The following is the list of blocks from the virtual
 		// disk that are assigned to the file. The first block
@@ -103,7 +108,12 @@ public class DiskUnitTester0 {
 		}
 
 	}
-
+	
+	/**
+	 * Internal method to make sure string can be written completely on Disk
+	 * @param vdb The Virtual Disk Block you are working with
+	 * @param value The desired value to copy next
+	 */
 	public static void copyNextBNToBlock(VirtualDiskBlock vdb, int value) { 
 		int lastPos = vdb.getCapacity()-1;
 
