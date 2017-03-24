@@ -17,6 +17,7 @@ public class DiskSystemManager {
 	 */
 	private ArrayList<String> diskUnitNames;
 	private static final String SYSTEMFILENAME = "diskIdentifiers.cfo";
+	private DiskUnit mountedDiskUnit = null;
 
 	public DiskSystemManager(){
 		this.diskUnitNames=new ArrayList<String>();
@@ -138,11 +139,25 @@ public class DiskSystemManager {
 		
 		
 	}
-	
+	public void mountDisk(String name){
+		try {
+			this.mountedDiskUnit=DiskUnit.mount(name);
+		} catch (NonExistingDiskException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	public void unmountDisk(){
+		this.mountedDiskUnit.shutdown();
+		this.mountedDiskUnit=null;
+	}
 	public int getNumberOfDisks(){
 		return this.diskUnitNames.size();
 	}
 	public String getName(int index){
 		return this.diskUnitNames.get(index);
+	}
+	public boolean diskIsMounted(){
+		return (!(this.mountedDiskUnit==null));
 	}
 }

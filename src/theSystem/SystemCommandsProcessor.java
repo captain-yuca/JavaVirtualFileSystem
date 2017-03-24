@@ -94,8 +94,8 @@ public class SystemCommandsProcessor extends CommandProcessor {
 		add(GENERALSTATE, SystemCommand.getFLSC("showdisks", new ShowDisksProcessor())); 
 		add(GENERALSTATE, SystemCommand.getFLSC("createDisk name int int", new CreateDiskProcessor())); 
 		add(GENERALSTATE, SystemCommand.getFLSC("deletedisk name", new DeleteDiskProcessor())); 
-		add(GENERALSTATE, SystemCommand.getFLSC("mount disk_name", new ShutDownProcessor())); 
-		add(GENERALSTATE, SystemCommand.getFLSC("unmount", new ShutDownProcessor())); 
+		add(GENERALSTATE, SystemCommand.getFLSC("mount disk_name", new MountDiskProcessor())); 
+		add(GENERALSTATE, SystemCommand.getFLSC("unmount", new UnmountDiskProcessor())); 
 		add(GENERALSTATE, SystemCommand.getFLSC("loadfile file_name existing_file_name", new ShutDownProcessor())); 
 //		add(GENERALSTATE, SystemCommand.getFLSC("cd dir_name", new ShutDownProcessor())); 
 //		add(GENERALSTATE, SystemCommand.getFLSC("mk dir", new ShutDownProcessor())); 
@@ -385,7 +385,6 @@ public class SystemCommandsProcessor extends CommandProcessor {
 			String name = fc.getOperand(1);
 
 
-			//String name = fc.getOperand(1); 
 
 			if (!OperandValidatorUtils.isValidName(name))
 				resultsList.add("Invalid name formation: " + name); 
@@ -393,6 +392,46 @@ public class SystemCommandsProcessor extends CommandProcessor {
 				resultsList.add("Name given does not exists: " + name); 
 			else 
 				diskManager.deleteDisk(name);
+			return resultsList; 
+		} 
+		
+	}
+	private class MountDiskProcessor implements CommandActionHandler {
+		@Override
+		public ArrayList<String> execute(Command c) {
+
+			resultsList = new ArrayList<String>(); 
+
+			FixedLengthCommand fc = (FixedLengthCommand) c;
+			String name = fc.getOperand(1);
+
+
+			if (!OperandValidatorUtils.isValidName(name))
+				resultsList.add("Invalid name formation: " + name); 
+			else if (!diskManager.diskExists(name)) 
+				resultsList.add("Disk name given does not exists: " + name); 
+			else 
+				diskManager.mountDisk(name);
+			return resultsList; 
+		} 
+		
+	}
+	private class UnmountDiskProcessor implements CommandActionHandler {
+		@Override
+		public ArrayList<String> execute(Command c) {
+
+			resultsList = new ArrayList<String>(); 
+
+			FixedLengthCommand fc = (FixedLengthCommand) c;
+			String name = fc.getOperand(1);
+
+
+			if (!OperandValidatorUtils.isValidName(name))
+				resultsList.add("Invalid name formation: " + name); 
+			else if (!diskManager.diskIsMounted()) 
+				resultsList.add("There is no disk mounted currently"); 
+			else 
+				diskManager.unmountDisk();
 			return resultsList; 
 		} 
 		
