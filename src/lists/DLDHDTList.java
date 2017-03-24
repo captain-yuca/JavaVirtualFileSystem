@@ -142,7 +142,6 @@ public class DLDHDTList<E> implements LinkedList<E> {
 	 * from the current instance of the list. 
 	 */
 	public void makeEmpty() { 
-		// TODO
 	}
 		
 	protected void finalize() throws Throwable {

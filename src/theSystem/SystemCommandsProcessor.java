@@ -91,16 +91,16 @@ public class SystemCommandsProcessor extends CommandProcessor {
 //		add(GENERALSTATE, SystemCommand.getFLSC("showlists", new ShowListsProcessor())); 		
 //		add(GENERALSTATE, SystemCommand.getFLSC("append name int", new AppendProcessor())); 
 //		add(GENERALSTATE, SystemCommand.getFLSC("showall name", new ShowAllProcessor()));
-		add(GENERALSTATE, SystemCommand.getFLSC("showdisks", new ShutDownProcessor())); 
+		add(GENERALSTATE, SystemCommand.getFLSC("showdisks", new ShowDisksProcessor())); 
 		add(GENERALSTATE, SystemCommand.getFLSC("createDisk name int int", new CreateDiskProcessor())); 
-		add(GENERALSTATE, SystemCommand.getFLSC("deletedisk disk_name", new ShutDownProcessor())); 
-		add(GENERALSTATE, SystemCommand.getFLSC("mount disk_name", new ShutDownProcessor())); 
-		add(GENERALSTATE, SystemCommand.getFLSC("unmount", new ShutDownProcessor())); 
+		add(GENERALSTATE, SystemCommand.getFLSC("deletedisk name", new DeleteDiskProcessor())); 
+		add(GENERALSTATE, SystemCommand.getFLSC("mount disk_name", new MountDiskProcessor())); 
+		add(GENERALSTATE, SystemCommand.getFLSC("unmount", new UnmountDiskProcessor())); 
 		add(GENERALSTATE, SystemCommand.getFLSC("loadfile file_name existing_file_name", new ShutDownProcessor())); 
-		add(GENERALSTATE, SystemCommand.getFLSC("cd dir_name", new ShutDownProcessor())); 
-		add(GENERALSTATE, SystemCommand.getFLSC("mk dir", new ShutDownProcessor())); 
-		add(GENERALSTATE, SystemCommand.getFLSC("rm dir", new ShutDownProcessor()));
-		add(GENERALSTATE, SystemCommand.getFLSC("rm filename", new ShutDownProcessor())); 
+//		add(GENERALSTATE, SystemCommand.getFLSC("cd dir_name", new ShutDownProcessor())); 
+//		add(GENERALSTATE, SystemCommand.getFLSC("mk dir", new ShutDownProcessor())); 
+//		add(GENERALSTATE, SystemCommand.getFLSC("rm dir", new ShutDownProcessor()));
+//		add(GENERALSTATE, SystemCommand.getFLSC("rm filename", new ShutDownProcessor())); 
 		add(GENERALSTATE, SystemCommand.getFLSC("cp file_name1 file_name2", new ShutDownProcessor())); 
 		add(GENERALSTATE, SystemCommand.getFLSC("ls", new ShutDownProcessor())); 
 		add(GENERALSTATE, SystemCommand.getFLSC("cat file_name", new ShutDownProcessor())); 
@@ -353,6 +353,85 @@ public class SystemCommandsProcessor extends CommandProcessor {
 				resultsList.add("Name give is already in use by another disk: " + name); 
 			else 
 				diskManager.createDisk(name, numberOfBlocks, size);
+			return resultsList; 
+		} 
+		
+	}
+	private class ShowDisksProcessor implements CommandActionHandler { 
+		   public ArrayList<String> execute(Command c) {  
+		
+			// command has no operand - nothing is needed from the
+			// command. if it comes here, it is the showall command....
+			resultsList = new ArrayList<String>(); 
+		
+			int nLists = diskManager.getNumberOfDisks();
+			if (nLists == 0)
+			    resultsList.add("There are no disks in the system at this moment."); 
+			else {
+			    resultsList.add("Names of the existing disks are: "); 
+			    for (int i=0; i<nLists; i++)
+				  resultsList.add("\t"+diskManager.getName(i)); 		
+			    }
+		      return resultsList; 
+		   } 
+		}
+	private class DeleteDiskProcessor implements CommandActionHandler {
+		@Override
+		public ArrayList<String> execute(Command c) {
+
+			resultsList = new ArrayList<String>(); 
+
+			FixedLengthCommand fc = (FixedLengthCommand) c;
+			String name = fc.getOperand(1);
+
+
+
+			if (!OperandValidatorUtils.isValidName(name))
+				resultsList.add("Invalid name formation: " + name); 
+			else if (!diskManager.diskExists(name)) 
+				resultsList.add("Name given does not exists: " + name); 
+			else 
+				diskManager.deleteDisk(name);
+			return resultsList; 
+		} 
+		
+	}
+	private class MountDiskProcessor implements CommandActionHandler {
+		@Override
+		public ArrayList<String> execute(Command c) {
+
+			resultsList = new ArrayList<String>(); 
+
+			FixedLengthCommand fc = (FixedLengthCommand) c;
+			String name = fc.getOperand(1);
+
+
+			if (!OperandValidatorUtils.isValidName(name))
+				resultsList.add("Invalid name formation: " + name); 
+			else if (!diskManager.diskExists(name)) 
+				resultsList.add("Disk name given does not exists: " + name); 
+			else 
+				diskManager.mountDisk(name);
+			return resultsList; 
+		} 
+		
+	}
+	private class UnmountDiskProcessor implements CommandActionHandler {
+		@Override
+		public ArrayList<String> execute(Command c) {
+
+			resultsList = new ArrayList<String>(); 
+
+			FixedLengthCommand fc = (FixedLengthCommand) c;
+			String name = fc.getOperand(1);
+
+
+			if (!OperandValidatorUtils.isValidName(name))
+				resultsList.add("Invalid name formation: " + name); 
+			else if (!diskManager.diskIsMounted()) 
+				resultsList.add("There is no disk mounted currently"); 
+			else 
+				diskManager.unmountDisk();
 			return resultsList; 
 		} 
 		

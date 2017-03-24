@@ -46,52 +46,42 @@ public class DLList<E> implements LinkedList<E> {
 	}
 
 	public Node<E> getLastNode() throws NodeOutOfBoundsException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public Node<E> getNodeAfter(Node<E> target) throws NodeOutOfBoundsException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public Node<E> getNodeBefore(Node<E> target) throws NodeOutOfBoundsException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public int length() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	public Node<E> removeFirstNode() throws NodeOutOfBoundsException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public Node<E> removeLastNode() throws NodeOutOfBoundsException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public void removeNode(Node<E> target) {
-		// TODO Auto-generated method stub
 
 	}
 
 	public Node<E> removeNodeAfter(Node<E> target) throws NodeOutOfBoundsException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public Node<E> removeNodeBefore(Node<E> target) throws NodeOutOfBoundsException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public Node<E> getFirstNode() throws NodeOutOfBoundsException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -104,7 +94,6 @@ public class DLList<E> implements LinkedList<E> {
 	 * from the linked list
 	 */
 	private void removeAll() {
-		// TODO
 	}
 	
 	/**
@@ -112,7 +101,6 @@ public class DLList<E> implements LinkedList<E> {
 	 * from the current instance of the list. 
 	 */
 	public void makeEmpty() { 
-		// TODO
 	}
 	
 	protected void finalize() { 
