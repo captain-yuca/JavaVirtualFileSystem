@@ -89,14 +89,14 @@ public class DiskSystemManager {
 	private void writeNameToSystemFile(String name){
 		try {
 			// Assume default encoding.
-			FileWriter fileWriter =new FileWriter(SYSTEMFILENAME);
+			FileWriter fileWriter =new FileWriter(SYSTEMFILENAME, true);
 
 			// Always wrap FileWriter in BufferedWriter.
 			BufferedWriter bufferedWriter =new BufferedWriter(fileWriter);
 
 			// Note that write() does not automatically
 			// append a newline character.
-			bufferedWriter.write(name);
+			bufferedWriter.append(name);
 			bufferedWriter.newLine();
 			// Always close files.
 			bufferedWriter.close();
@@ -107,6 +107,36 @@ public class DiskSystemManager {
 							+ SYSTEMFILENAME + "'");
 
 		}
+	}
+	public void deleteDisk(String diskName){
+		//This method assumes that the disk to delete does exist
+		File fileToDelete = new File(diskName);
+		fileToDelete.delete();
+		this.diskUnitNames.remove(diskName);
+		try {
+			// Assume default encoding.
+			FileWriter fileWriter =new FileWriter(SYSTEMFILENAME);
+
+			// Always wrap FileWriter in BufferedWriter.
+			BufferedWriter bufferedWriter =new BufferedWriter(fileWriter);
+
+			// Note that write() does not automatically
+			// append a newline character.
+			for(String name : this.diskUnitNames){
+				bufferedWriter.append(name);
+				bufferedWriter.newLine();
+			}
+			// Always close files.
+			bufferedWriter.close();
+		}
+		catch(IOException ex) {
+			System.out.println(
+					"Error writing to file '"
+							+ SYSTEMFILENAME + "'");
+
+		}
+		
+		
 	}
 	
 	public int getNumberOfDisks(){
