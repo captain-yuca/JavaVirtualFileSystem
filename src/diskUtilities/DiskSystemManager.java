@@ -108,4 +108,11 @@ public class DiskSystemManager {
 
 		}
 	}
+	
+	public int getNumberOfDisks(){
+		return this.diskUnitNames.size();
+	}
+	public String getName(int index){
+		return this.diskUnitNames.get(index);
+	}
 }
