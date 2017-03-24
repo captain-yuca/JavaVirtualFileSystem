@@ -27,24 +27,18 @@ public class DiskSystemManager {
 	 * Creates a new disk unit with the given name. The disk is formatted
 	 * as with the specified capacity (number of blocks), each of specified
 	 * size (number of bytes).  The created disk is left as in off mode.
+	 * Then, adds the name of said DiskUnit to the System File
 	 * @param name Name of the disk you want to create
 	 * @param capacity Capacity of the blocks you wish to have
 	 * @param blockSize Size of each VirtualDiskBlock
 	 */
 	public void createDisk(String name, int capacity, int blockSize){
 		DiskUnit.createDiskUnit(name, capacity, blockSize);
-		DiskUnit diskToAddToList=null;
-		try {
-			diskToAddToList = DiskUnit.mount(name);
-			System.out.println(diskToAddToList);
-			this.diskUnitNames.add(name);
-			writeNameToSystemFile(name);
-		} catch (NonExistingDiskException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		//Adds the name for the created RAF to the arrayList of diskUnitNames
+		this.diskUnitNames.add(name);
+		writeNameToSystemFile(name);
 
-		//TODO: Add Disk Name to the txt file and add it to the arrayList.
+
 
 	}
 	
@@ -64,6 +58,8 @@ public class DiskSystemManager {
 		File systemFile = new File(SYSTEMFILENAME);
 		// This will reference one line at a time
 		String line = null;
+		
+		//If the SystemFile exists, start reading the names
 		if (systemFile.exists()){
 			try {
 				FileReader fileReader = new FileReader(SYSTEMFILENAME);
@@ -93,12 +89,10 @@ public class DiskSystemManager {
 	private void writeNameToSystemFile(String name){
 		try {
 			// Assume default encoding.
-			FileWriter fileWriter =
-					new FileWriter(SYSTEMFILENAME);
+			FileWriter fileWriter =new FileWriter(SYSTEMFILENAME);
 
 			// Always wrap FileWriter in BufferedWriter.
-			BufferedWriter bufferedWriter =
-					new BufferedWriter(fileWriter);
+			BufferedWriter bufferedWriter =new BufferedWriter(fileWriter);
 
 			// Note that write() does not automatically
 			// append a newline character.
