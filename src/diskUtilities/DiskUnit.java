@@ -25,6 +25,20 @@ public class DiskUnit {
 	private int blockSize; 
 	
 	/**
+	 * Index of the first block (the root) in the collection of free data blocks in the disk (firstFLB)
+	 */
+	private int firstBlockIndex;
+	
+	/**
+	 * Index of the first free i-node in the list of free i-nodes.
+	 */
+	private int firstFreeINodeIndex;
+	
+	/**
+	 * Number of total i-nodes that the disk has (all, those free plus those taken)
+	 */
+	private int totalINodes;
+	/**
 	 * The Random Access File that represents the disk
 	 */
 	public RandomAccessFile disk;
@@ -39,10 +53,7 @@ public class DiskUnit {
 	 */
 	private final static int DEFAULT_BLOCK_SIZE = 256;
 	
-	/**
-	 * Reserved space for capacity and block size fields. 8 due to 4(int) + 4(int) 
-	 */
-	private final static int RESERVED_SPACE = 8;
+	
 
 	/**
 	 * Private constructor for DiskUnit
@@ -71,6 +82,8 @@ public class DiskUnit {
 	 * instance does not match the block size of the current disk instance)
 	 */
 	public void write(int blockNum, VirtualDiskBlock b) throws InvalidBlockNumberException, InvalidBlockException{
+		if(blockNum == 0)
+			throw new InvalidBlockNumberException("The block 0 is reserved.");
 		int offset = blockNum*this.getBlockSize();
 		try {
 			this.disk.seek(offset);
@@ -120,15 +133,8 @@ public class DiskUnit {
 	 * @return The capacity of the DiskUnit instance.
 	 **/
 	public int getCapacity(){
-		int currentCapacity = 0;
-		try {
-			this.disk.seek(0);
-
-			currentCapacity=this.disk.readInt();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return currentCapacity;
+		
+		return this.capacity;
 	}
 	
 	/** 
@@ -136,17 +142,7 @@ public class DiskUnit {
 	 * @return The blockSize of the VirtualDiskBlock instances utilized on this DiskUnit
 	 **/
 	public int getBlockSize(){
-		int currentBlockSize = 0;
-		try {
-			this.disk.seek(RESERVED_SPACE/2);
-			currentBlockSize = this.disk.readInt();
-
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return currentBlockSize;
+		return this.blockSize;
 	}
 
 	/** 
@@ -244,7 +240,9 @@ public class DiskUnit {
 			throw new ExistingDiskException("Disk name is already used: " + name);
 
 		RandomAccessFile disk = null;
-		if (capacity < 0 || blockSize < 0 ||
+		
+		//UPDATE: Block size must be minimum 32 to acomodate for new parameters
+		if (capacity < 0 || blockSize < 32 ||
 				!Utils.powerOf2(capacity) || !Utils.powerOf2(blockSize))
 			throw new InvalidParameterException("Invalid values: " +
 					" capacity = " + capacity + " block size = " +
