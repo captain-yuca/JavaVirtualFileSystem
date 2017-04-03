@@ -9,7 +9,7 @@ public class DiskUnitTester1 {
 	 * @throws NonExistingDiskException 
 	 */
 	public static void main(String[] args) throws NonExistingDiskException {
-		DiskUnit d = DiskUnit.mount("disk1"); // edit the name of the disk to mount
+		DiskUnit d = DiskUnit.mount("test-disk"); // edit the name of the disk to mount
 		
 	    showDiskContent(d); 
 		

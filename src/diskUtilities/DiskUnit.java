@@ -30,7 +30,7 @@ public class DiskUnit {
 	 */
 	private int firstBlockIndex;
 	
-	private int nextFreeBlockIndex;
+	private int freeBlockIndex;
 
 	/**
 	 * Index of the first free i-node in the list of free i-nodes.
@@ -147,6 +147,69 @@ public class DiskUnit {
 	public int getBlockSize(){
 		return this.blockSize;
 	}
+	
+	//TODO: Documentation
+	public int getFirstBlockIndex() {
+		return firstBlockIndex;
+	}
+	
+	//TODO:Documentation
+	public int getFreeBlockIndex() {
+		return freeBlockIndex;
+	}
+	
+	//TODO:Documentation
+	public int getFirstFreeINodeIndex() {
+		return firstFreeINodeIndex;
+	}
+	
+	//TODO:Documentation
+	public int getTotalINodes() {
+		return totalINodes;
+	}
+	
+	/**
+	 * @param freeBlockIndex the freeBlockIndex to set
+	 */
+	public void setFreeBlockIndex(int freeBlockIndex) {
+		this.freeBlockIndex = freeBlockIndex;
+		try {
+			this.disk.seek(12);
+			this.disk.writeInt(freeBlockIndex);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * @param firstBlockIndex the firstBlockIndex to set
+	 */
+	public void setFirstBlockIndex(int firstBlockIndex) {
+		this.firstBlockIndex = firstBlockIndex;
+		try {
+			this.disk.seek(8);
+			this.disk.writeInt(firstBlockIndex);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	/**
+	 * @param firstFreeINodeIndex the firstFreeINodeIndex to set
+	 */
+	public void setFirstFreeINodeIndex(int firstFreeINodeIndex) {
+		this.firstFreeINodeIndex = firstFreeINodeIndex;
+		try {
+			this.disk.seek(16);
+			this.disk.writeInt(firstFreeINodeIndex);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	/** 
 	 * Formats the disk. This operation visits every �physical block� 
@@ -182,7 +245,7 @@ public class DiskUnit {
 	 * @param name the name of the disk unit to activate
 	 * @return the corresponding DiskUnit object
 	 * @throws NonExistingDiskException whenever no
-	 *    �disk� with the specified name is found.
+	 *    disk with the specified name is found.
 	 */
 	public static DiskUnit mount(String name)
 			throws NonExistingDiskException
@@ -199,7 +262,18 @@ public class DiskUnit {
 			dUnit.disk.seek(0);
 			dUnit.capacity = dUnit.disk.readInt();
 			dUnit.blockSize = dUnit.disk.readInt();
-		} catch (IOException e) {
+			
+			//If firstBlockIndex is 0, it means it is not a disk that can have FileManagement 
+			//implemented since the disk wasn't created with the appropriate method.
+			dUnit.firstBlockIndex = dUnit.disk.readInt();
+			dUnit.freeBlockIndex = dUnit.disk.readInt();
+			dUnit.firstFreeINodeIndex = dUnit.disk.readInt();
+			dUnit.totalINodes = dUnit.disk.readInt();
+			
+			
+				
+			}
+		 catch (IOException e) {
 			e.printStackTrace();
 		}
 
@@ -260,7 +334,7 @@ public class DiskUnit {
 			System.exit(1);
 		}
 
-		reserveDiskSpace(disk, capacity, blockSize);
+		reserveDiskSpace(disk, capacity, blockSize,0,0,0,0);
 
 		// after creation, just leave it in shutdown mode - just
 		// close the corresponding file
