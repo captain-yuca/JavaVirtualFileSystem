@@ -24,11 +24,14 @@ public class DiskUnit {
 	 */
 	private int blockSize; 
 	
+	
 	/**
 	 * Index of the first block (the root) in the collection of free data blocks in the disk (firstFLB)
 	 */
 	private int firstBlockIndex;
 	
+	private int nextFreeBlockIndex;
+
 	/**
 	 * Index of the first free i-node in the list of free i-nodes.
 	 */
@@ -242,7 +245,7 @@ public class DiskUnit {
 		RandomAccessFile disk = null;
 		
 		//UPDATE: Block size must be minimum 32 to acomodate for new parameters
-		if (capacity < 0 || blockSize < 32 ||
+		if (capacity < 0 || blockSize < 8 ||
 				!Utils.powerOf2(capacity) || !Utils.powerOf2(blockSize))
 			throw new InvalidParameterException("Invalid values: " +
 					" capacity = " + capacity + " block size = " +
@@ -258,6 +261,43 @@ public class DiskUnit {
 		}
 
 		reserveDiskSpace(disk, capacity, blockSize);
+
+		// after creation, just leave it in shutdown mode - just
+		// close the corresponding file
+		try {
+			disk.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	//TODO: Verify if it needs more Exception since I added more parameters to the method.
+	public static void createDiskUnit(String name, int capacity, int blockSize,int firstBlockIndex, int nextFreeBlockIndex, int firstFreeINodeIndex, int totalINodes)
+			throws ExistingDiskException, InvalidParameterException
+	{
+		File file=new File(name);
+		if (file.exists())
+			throw new ExistingDiskException("Disk name is already used: " + name);
+
+		RandomAccessFile disk = null;
+		
+		//UPDATE: Block size must be minimum 32 to acomodate for new parameters
+		if (capacity < 0 || blockSize < 32 ||
+				!Utils.powerOf2(capacity) || !Utils.powerOf2(blockSize))
+			throw new InvalidParameterException("Invalid values: " +
+					" capacity = " + capacity + " block size = " +
+					blockSize);
+		// disk parameters are valid... hence create the file to represent the
+		// disk unit.
+		try {
+			disk = new RandomAccessFile(name, "rw");
+		}
+		catch (IOException e) {
+			System.err.println ("Unable to start the disk");
+			System.exit(1);
+		}
+
+		reserveDiskSpace(disk, capacity, blockSize, firstBlockIndex, nextFreeBlockIndex,firstFreeINodeIndex, totalINodes);
 
 		// after creation, just leave it in shutdown mode - just
 		// close the corresponding file
@@ -293,5 +333,36 @@ public class DiskUnit {
 			e.printStackTrace();
 		} 	
 	}
+	
+	
+	//TODO: Verify if it needs more Exception since I added more parameters to the method.
+
+	/**
+	 * Reserves the specified capacity of blocks with blockSize of the specified parameter.
+	 * @param disk The disk you wish to reserve the space on.
+	 * @param capacity Number of blocks you want to reserve.
+	 */
+	private static void reserveDiskSpace(RandomAccessFile disk, int capacity,
+			int blockSize, int firstBlockIndex, int nextFreeBlockIndex, int firstFreeINodeIndex, int totalINodes)
+	{
+		reserveDiskSpace(disk, capacity, blockSize);
+		try {
+			disk.seek(8);
+			disk.writeInt(firstBlockIndex);
+			disk.writeInt(nextFreeBlockIndex);
+			disk.writeInt(firstFreeINodeIndex);
+			disk.writeInt(totalINodes);
+
+
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+		
+	}
+	
+	
 
 }

@@ -34,12 +34,10 @@ public class DiskSystemManager {
 	 * @param blockSize Size of each VirtualDiskBlock
 	 */
 	public void createDisk(String name, int capacity, int blockSize){
-		DiskUnit.createDiskUnit(name, capacity, blockSize);
+		FileSystemManager.createFormattedDiskForUse(name, capacity, blockSize);
 		//Adds the name for the created RAF to the arrayList of diskUnitNames
 		this.diskUnitNames.add(name);
 		writeNameToSystemFile(name);
-
-
 
 	}
 	
