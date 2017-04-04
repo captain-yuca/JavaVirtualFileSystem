@@ -10,6 +10,8 @@ import java.io.IOException;
 
 import exceptions.NonExistingDiskException;
 
+
+//TODO: Clean Up Code
 public class FileSystemManager {
 	//TODO: Documentation
 	final static int INODESIZE = 9;
@@ -26,10 +28,8 @@ public class FileSystemManager {
 		double totalINodes= spaceAvailable/INODESIZE;
 		
 		
-		System.out.println(totalINodes);
 		double iNodesPerBlock =  Math.ceil((double)(blockSize/INODESIZE));
 		
-		System.out.println(firstFreeBlock);
 		int nextFreeBlockIndex = (int)firstFreeBlock+1;
 		DiskUnit.createDiskUnit(name, capacity, blockSize, (int)firstFreeBlock, (int)nextFreeBlockIndex, 2, (int)totalINodes);
 		DiskUnit du=null;
@@ -40,9 +40,9 @@ public class FileSystemManager {
 			e.printStackTrace();
 		} 
 		
-		if(du.getFirstBlockIndex()==0)
+//		if(du.getFirstBlockIndex()==0);
 			//TODO: Throw NotValidDiskException
-		formatFreeINodes(du, (int)spaceAvailable);
+		formatFreeINodes(du, (int)iNodesPerBlock);
 		formatFreeBlocks(du);
 		
 
@@ -95,23 +95,26 @@ public class FileSystemManager {
 		
 		du.setFirstBlockIndex(currentVDB);
 		du.setFreeBlockIndex(freeBlockCounter-1);
-		System.out.println(du.getFreeBlockIndex());
 	}
 	
+	//TODO:Documentation
 	private static void formatFreeINodes(DiskUnit du, int iNodesPerBlock){
 		//Total INodes that will be placed
 		int totalINodes= du.getTotalINodes();
 		int blockSize = du.getBlockSize();
+		
+		
+
 		//Number of Blocks reserved for INodes
 		int totalBlocksForINodes = totalINodes/iNodesPerBlock;
 		//Counter to track which INode to set as the next free Inode
-		int iNodeCounter=2;
+		int iNodeCounter=1;
 		VirtualDiskBlock vdbToAdd;
 		
 		//TODO: Find better algorithm
-		for(int i=0; i<totalBlocksForINodes; i++){
-			vdbToAdd = new VirtualDiskBlock();
-			for(int j=0; j<blockSize; j+=9){
+		for(int i=1; i<totalBlocksForINodes+1; i++){
+			vdbToAdd = new VirtualDiskBlock(blockSize);
+			for(int j=0; j<blockSize-9; j=j+9){
 				Utils.copyIntToBlock(vdbToAdd, j, iNodeCounter);
 				Utils.copyIntToBlock(vdbToAdd, j+4, 0);
 				vdbToAdd.setElement(j+8, (byte) 0);
@@ -125,7 +128,7 @@ public class FileSystemManager {
 			du.write(i, vdbToAdd);
 			
 		}
-		du.setFirstFreeINodeIndex(2);
+		du.setFirstFreeINodeIndex(1);
 		
 		
 
@@ -136,22 +139,29 @@ public class FileSystemManager {
 	//TODO: Documentation
 	public static void writeFile(String fileToRead, String fileToCreate, DiskUnit du){
 		
-		
-		
 		File fileToCopy = new File(fileToRead);
 		// This will reference one line at a time
 		String line = null;
 		
 		//If the SystemFile exists, start reading the names
 		if (fileToCopy.exists()){
+			//TODO: Verify if there is a Free INode
+			//TODO: Verify if there is a Free Space
+			int[] freeINode=getFreeINode(du);
+			int freeSpaceBlock = getFreeSpaceBlock(du);
 			
+			
+			/*
+			 * Obtain the String to write on the Disk
+			 */
+			String stringToCopy="";
 			try {
 				FileReader fileReader = new FileReader(fileToRead);
 				BufferedReader bufferedReader = new BufferedReader(fileReader);
 				while((line = bufferedReader.readLine()) != null) {
-					System.out.println(line);
-				}				
-				bufferedReader.close();
+					stringToCopy=stringToCopy+line + "\n";
+				}	
+				
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch(IOException ex) {
@@ -159,6 +169,55 @@ public class FileSystemManager {
 						"Error reading file '" 
 								+ fileToRead + "'");                  
 			}
+			
+			/*
+			 * Register INode
+			 */
+			VirtualDiskBlock inodeVDB = new VirtualDiskBlock(du.getBlockSize());
+			INode iNodeToAdd = new INode((byte)1, stringToCopy.length(), freeSpaceBlock);
+			du.read(freeINode[0], inodeVDB);
+			//First Data Block In File
+			Utils.copyIntToBlock(inodeVDB, freeINode[1], iNodeToAdd.getFirstBlockIndex());
+			//File Size
+			Utils.copyIntToBlock(inodeVDB, freeINode[1]+4, iNodeToAdd.getFileSize());
+			//Set type to file
+			inodeVDB.setElement(freeINode[1]+8, (byte)1);
+			
+			//Place it back with the new information
+			du.write(freeINode[0], inodeVDB);
+
+			
+			/*
+			 * Copy the string to the file
+			 */
+			int currentBlockSizeCounter=0;
+			int blockSize = du.getBlockSize();
+			VirtualDiskBlock vdb = new VirtualDiskBlock(blockSize);
+			for(int i=0; i<stringToCopy.length(); i++){
+				if(currentBlockSizeCounter>=blockSize-5){
+					
+					//Store reference to the current vdb its working on and
+					//obtain the next free space block
+					int currentTemp = freeSpaceBlock;
+					freeSpaceBlock = getFreeSpaceBlock(du);
+					
+					//Adds reference to next disk block that contains file
+					Utils.copyIntToBlock(vdb, blockSize-5, freeSpaceBlock);
+					//Adds the block to the currentTemp
+					du.write(currentTemp, vdb);
+					
+					//Reset vdb and currentBlockSizeCounter
+					vdb = new VirtualDiskBlock(blockSize);
+					currentBlockSizeCounter=0;
+					
+				}
+				Utils.copyCharToBlock(vdb, currentBlockSizeCounter, stringToCopy.charAt(i));
+				currentBlockSizeCounter++;
+			}
+			Utils.copyIntToBlock(vdb, blockSize-5, 0);
+			du.write(freeSpaceBlock, vdb);
+
+			
 		}
 	}
 	
@@ -166,7 +225,8 @@ public class FileSystemManager {
 	private static int getFreeSpaceBlock(DiskUnit du){
 		int freeBlockIndex;
 		int fbi = du.getFreeBlockIndex();
-		if(du.getFirstBlockIndex()==0);
+		if(du.getFirstBlockIndex()==0)
+			return -1;
 			//TODO: FullDiskException
 		
 		//If the disk has space
@@ -186,20 +246,40 @@ public class FileSystemManager {
 	}
 	
 	//TODO:Documentation
-	private static int getFreeINode(DiskUnit du){
-		int freeINodeIndex=-1;
-		if(du.getFirstFreeINodeIndex()==0)
-			//TODO: Throw NoFreeINodesException
+	//Returns the block in which the INode resides and the index where the INode Starts
+	private static int[]getFreeINode(DiskUnit du){
+		int freeINodeIndex=du.getFirstFreeINodeIndex();
+		if(du.getFirstFreeINodeIndex()==0);
+		//TODO: Throw NoFreeINodesException
+
+		//Calculate the block in which it resides
+		double INodesPerBlock = Math.floor((double)(du.getBlockSize()/INODESIZE));
+		double freeINodeBlock = Math.ceil(freeINodeIndex/INodesPerBlock);
+		double internalIndex = (freeINodeIndex-(INodesPerBlock*freeINodeBlock-INodesPerBlock))*INODESIZE;
+		
+		
 		
 		//TODO:Modify and Document names
-		freeINodeIndex=du.getFirstFreeINodeIndex();
-		//Calculate where is next INode
-		double INodesPerBlock = Math.ceil((double)(du.getBlockSize()/INODESIZE));
-		double nextBlock= Math.floor(freeINodeIndex/INodesPerBlock);
-		double nextFreeINodeIndex= nextBlock*du.getBlockSize()-freeINodeIndex;
-		VirtualDiskBlock blockToRead=null;
-		du.read((int)nextBlock, blockToRead);
-		du.setFirstFreeINodeIndex(Utils.getIntFromBlock(blockToRead, (int)nextFreeINodeIndex));
-		return freeINodeIndex;
+		
+		
+
+		/*
+		 * Set next INode
+		 */
+		
+		//Access current free INode
+		VirtualDiskBlock vdb = new VirtualDiskBlock(du.getBlockSize());
+		du.read((int)freeINodeBlock, vdb);
+		
+		//Read the next free INode index from current one
+		//and set it as the next free INode
+		
+		du.setFirstFreeINodeIndex(Utils.getIntFromBlock(vdb, (int)internalIndex));
+		
+		int[] arrayToReturn = {(int)freeINodeBlock,(int)internalIndex};
+		return arrayToReturn;
+	}
+	private static void configureRootINode(DiskUnit du){
+		
 	}
 }
