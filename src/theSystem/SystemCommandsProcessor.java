@@ -14,6 +14,7 @@ import systemGeneralClasses.SystemCommand;
 import systemGeneralClasses.VariableLengthCommand;
 import stack.IntStack;
 import diskUtilities.*;
+import exceptions.NonExistingDiskException;
 
 
 /**
@@ -92,18 +93,18 @@ public class SystemCommandsProcessor extends CommandProcessor {
 //		add(GENERALSTATE, SystemCommand.getFLSC("append name int", new AppendProcessor())); 
 //		add(GENERALSTATE, SystemCommand.getFLSC("showall name", new ShowAllProcessor()));
 		add(GENERALSTATE, SystemCommand.getFLSC("showdisks", new ShowDisksProcessor())); 
-		add(GENERALSTATE, SystemCommand.getFLSC("createDisk name int int", new CreateDiskProcessor())); 
+		add(GENERALSTATE, SystemCommand.getFLSC("createdisk name int int", new CreateDiskProcessor())); 
 		add(GENERALSTATE, SystemCommand.getFLSC("deletedisk name", new DeleteDiskProcessor())); 
-		add(GENERALSTATE, SystemCommand.getFLSC("mount disk_name", new MountDiskProcessor())); 
+		add(GENERALSTATE, SystemCommand.getFLSC("mount name", new MountDiskProcessor())); 
 		add(GENERALSTATE, SystemCommand.getFLSC("unmount", new UnmountDiskProcessor())); 
-		add(GENERALSTATE, SystemCommand.getFLSC("loadfile file_name existing_file_name", new ShutDownProcessor())); 
+		add(GENERALSTATE, SystemCommand.getFLSC("loadfile name name", new LoadFileProcessor())); 
 //		add(GENERALSTATE, SystemCommand.getFLSC("cd dir_name", new ShutDownProcessor())); 
 //		add(GENERALSTATE, SystemCommand.getFLSC("mk dir", new ShutDownProcessor())); 
 //		add(GENERALSTATE, SystemCommand.getFLSC("rm dir", new ShutDownProcessor()));
 //		add(GENERALSTATE, SystemCommand.getFLSC("rm filename", new ShutDownProcessor())); 
-		add(GENERALSTATE, SystemCommand.getFLSC("cp file_name1 file_name2", new ShutDownProcessor())); 
-		add(GENERALSTATE, SystemCommand.getFLSC("ls", new ShutDownProcessor())); 
-		add(GENERALSTATE, SystemCommand.getFLSC("cat file_name", new ShutDownProcessor())); 
+		add(GENERALSTATE, SystemCommand.getFLSC("cp name name", new CopyProcessor())); 
+		add(GENERALSTATE, SystemCommand.getFLSC("ls", new ListDirProcessor())); 
+		add(GENERALSTATE, SystemCommand.getFLSC("cat name", new DisplayFileProcessor())); 
 		add(GENERALSTATE, SystemCommand.getFLSC("exit", new ShutDownProcessor())); 
 		add(GENERALSTATE, SystemCommand.getFLSC("help", new HelpProcessor())); 
 				
@@ -369,8 +370,26 @@ public class SystemCommandsProcessor extends CommandProcessor {
 			    resultsList.add("There are no disks in the system at this moment."); 
 			else {
 			    resultsList.add("Names of the existing disks are: "); 
-			    for (int i=0; i<nLists; i++)
-				  resultsList.add("\t"+diskManager.getName(i)); 		
+				String str="";
+
+			    for (int i=0; i<nLists; i++){
+			    	if(diskManager.getName(i).equals(diskManager.mountedDiskName))
+						try {
+							str="\t"+diskManager.getName(i) +"\t "+ DiskUnit.mount(diskManager.getName(i)).getBlockSize()+"\t "+ DiskUnit.mount(diskManager.getName(i)).getCapacity()+"\t"+ "mounted";
+						} catch (NonExistingDiskException e) {
+							e.printStackTrace();
+						}
+			    	else{
+			    		try {
+							str="\t"+diskManager.getName(i) +"\t "+ DiskUnit.mount(diskManager.getName(i)).getBlockSize()+"\t "+ DiskUnit.mount(diskManager.getName(i)).getCapacity()+"\t"+ "unmounted";
+						} catch (NonExistingDiskException e) {
+							e.printStackTrace();
+						}
+			    	}
+			    resultsList.add(str);
+			    }
+			    	
+					
 			    }
 		      return resultsList; 
 		   } 
@@ -423,15 +442,95 @@ public class SystemCommandsProcessor extends CommandProcessor {
 			resultsList = new ArrayList<String>(); 
 
 			FixedLengthCommand fc = (FixedLengthCommand) c;
-			String name = fc.getOperand(1);
 
 
-			if (!OperandValidatorUtils.isValidName(name))
-				resultsList.add("Invalid name formation: " + name); 
-			else if (!diskManager.diskIsMounted()) 
+			 if (!diskManager.diskIsMounted()) 
 				resultsList.add("There is no disk mounted currently"); 
 			else 
 				diskManager.unmountDisk();
+			return resultsList; 
+		} 
+		
+	}
+	private class LoadFileProcessor implements CommandActionHandler {
+		@Override
+		public ArrayList<String> execute(Command c) {
+
+			resultsList = new ArrayList<String>(); 
+
+			FixedLengthCommand fc = (FixedLengthCommand) c;
+			String fileToRead = fc.getOperand(1);
+			String newFile = fc.getOperand(2);
+
+
+			if (!OperandValidatorUtils.isValidName(fileToRead))
+				resultsList.add("Invalid name formation: " + fileToRead);
+			else if(!OperandValidatorUtils.isValidName(newFile))
+				resultsList.add("Invalid name formation: " + newFile);
+			else if (!diskManager.diskIsMounted()) 
+				resultsList.add("There is no disk mounted currently"); 
+			else 
+				diskManager.loadFile(fileToRead, newFile);
+			return resultsList; 
+		} 
+		
+	}
+	private class DisplayFileProcessor implements CommandActionHandler {
+		@Override
+		public ArrayList<String> execute(Command c) {
+
+			resultsList = new ArrayList<String>(); 
+
+			FixedLengthCommand fc = (FixedLengthCommand) c;
+			String fileToDisplay = fc.getOperand(1);
+
+
+			if (!OperandValidatorUtils.isValidName(fileToDisplay))
+				resultsList.add("Invalid name formation: " + fileToDisplay);
+			else if (!diskManager.diskIsMounted()) 
+				resultsList.add("There is no disk mounted currently"); 
+			else 
+				diskManager.displayFile(fileToDisplay);
+			return resultsList; 
+		} 
+		
+	}
+	private class ListDirProcessor implements CommandActionHandler {
+		@Override
+		public ArrayList<String> execute(Command c) {
+
+			resultsList = new ArrayList<String>(); 
+
+			FixedLengthCommand fc = (FixedLengthCommand) c;
+
+			if (!diskManager.diskIsMounted()) 
+				resultsList.add("There is no disk mounted currently"); 
+			else
+				diskManager.showDir();
+			
+			return resultsList; 
+		} 
+		
+	}
+	private class CopyProcessor implements CommandActionHandler {
+		@Override
+		public ArrayList<String> execute(Command c) {
+
+			resultsList = new ArrayList<String>(); 
+
+			FixedLengthCommand fc = (FixedLengthCommand) c;
+			String fileToCopy = fc.getOperand(1);
+			String fileToCopyOnto = fc.getOperand(2);
+
+
+			if (!OperandValidatorUtils.isValidName(fileToCopy))
+				resultsList.add("Invalid name formation: " + fileToCopy);
+			else if(!OperandValidatorUtils.isValidName(fileToCopyOnto))
+				resultsList.add("Invalid name formation: " + fileToCopyOnto);
+			else if (!diskManager.diskIsMounted()) 
+				resultsList.add("There is no disk mounted currently"); 
+			else 
+				diskManager.copyFile(fileToCopy, fileToCopyOnto);
 			return resultsList; 
 		} 
 		

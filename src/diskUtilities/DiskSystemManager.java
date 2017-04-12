@@ -13,11 +13,20 @@ import exceptions.NonExistingDiskException;
 
 public class DiskSystemManager {
 	/**
-	 * Names of
+	 * Names of the DiskUnits available
 	 */
 	private ArrayList<String> diskUnitNames;
+	
+	/**
+	 * The name of the file containing the disk identifiers
+	 */
 	private static final String SYSTEMFILENAME = "diskIdentifiers.cfo";
+	
+	/**
+	 * Current mounted disk
+	 */
 	private DiskUnit mountedDiskUnit = null;
+	public String mountedDiskName=null;
 
 	public DiskSystemManager(){
 		this.diskUnitNames=new ArrayList<String>();
@@ -40,6 +49,20 @@ public class DiskSystemManager {
 		writeNameToSystemFile(name);
 
 	}
+	
+	/**
+	 * Loads a file onto the mounted DiskUnit
+	 * @param fileToLoad name of the file to load
+	 * @param newFile The name of the new file to be created
+	 */
+	public void loadFile(String fileToLoad, String newFile){
+		try {
+			FileSystemManager.writeFile(fileToLoad, newFile, this.mountedDiskUnit);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	
 	/**
 	 * Verifies if the diskName exists in the System File
@@ -107,11 +130,16 @@ public class DiskSystemManager {
 
 		}
 	}
+	
+	/**
+	 * Deletes said Disk from the system
+	 * @param diskName Name of the RAF to be deleted
+	 */
 	public void deleteDisk(String diskName){
 		//This method assumes that the disk to delete does exist
 		File fileToDelete = new File(diskName);
 		fileToDelete.delete();
-		this.diskUnitNames.remove(diskName);
+		System.out.println(this.diskUnitNames.remove(diskName));
 		try {
 			// Assume default encoding.
 			FileWriter fileWriter =new FileWriter(SYSTEMFILENAME);
@@ -137,25 +165,84 @@ public class DiskSystemManager {
 		
 		
 	}
+	
+	/**
+	 * Mount the DiskUnit of given name
+	 * @param name Name of disk
+	 */
 	public void mountDisk(String name){
 		try {
 			this.mountedDiskUnit=DiskUnit.mount(name);
+			this.mountedDiskName=name;
 		} catch (NonExistingDiskException e) {
 			e.printStackTrace();
 		}
 		
 	}
+	
+	/**
+	 * Unmounts the currently mounted disk
+	 */
 	public void unmountDisk(){
 		this.mountedDiskUnit.shutdown();
 		this.mountedDiskUnit=null;
 	}
+	
+	/**
+	 * Returns the available DiskUnits in the system
+	 * @return how many disks are there in the system
+	 */
 	public int getNumberOfDisks(){
 		return this.diskUnitNames.size();
 	}
+	
+	/**
+	 * Given an index, fetches the name of the position given
+	 * @param index index in the list
+	 * @return the name corresponding to the list
+	 */
 	public String getName(int index){
 		return this.diskUnitNames.get(index);
 	}
+	
+	/**
+	 * Returns if there is a disk mounted in the system
+	 * @return true if there is a disk mounted
+	 */
 	public boolean diskIsMounted(){
 		return (!(this.mountedDiskUnit==null));
+	}
+	
+	/**
+	 * Displays the internal file given by the name fileToDisplay in the mountedDisk
+	 * @param fileToDisplay name of the internal file to dispkay
+	 */
+	public void displayFile(String fileToDisplay) {
+		try {
+			FileSystemManager.displayFile(fileToDisplay, this.mountedDiskUnit);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Shows the whole root of the file system
+	 */
+	public void showDir(){
+		FileSystemManager.showDir(this.mountedDiskUnit);
+	}
+	
+	/**
+	 * Copies an internal file to another internal file. If the second internal file does
+	 * not exist, it creates a new one
+	 * @param file1 file to copy
+	 * @param file2 file that will be overwritten
+	 */
+	public void copyFile(String file1, String file2){
+		try {
+			FileSystemManager.copyFile(file1, file2, this.mountedDiskUnit);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 }

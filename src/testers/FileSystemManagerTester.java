@@ -3,6 +3,7 @@ package testers;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -72,7 +73,11 @@ public class FileSystemManagerTester {
 		} catch (NonExistingDiskException e) {
 }
 
-		FileSystemManager.writeFile("fileToAdd.txt", "fileToTest", testDisk);
+		try {
+			FileSystemManager.writeFile("fileToAdd.txt", "fileToTest", testDisk);
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
 //		System.out.println(TesterUtils.buildStringWithINodeParams(0, testDisk));
 //		TesterUtils.showChars(testDisk);
 
@@ -87,13 +92,17 @@ public class FileSystemManagerTester {
 //		System.out.println(TesterUtils.buildStringWithINodeParams(0, testDisk));
 
 		
-		FileSystemManager.writeFile("fileToAdd2.txt", "fileToTest2", testDisk);
+		try {
+			FileSystemManager.writeFile("fileToAdd2.txt", "fileToTest2", testDisk);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 		
 		assertTrue("Did not match the iNode params: " + 
 				TesterUtils.buildStringWithINodeParams(2, testDisk), 
 				TesterUtils.buildStringWithINodeParams(2, testDisk).equals("1014-32-1"));
-		System.out.println(TesterUtils.buildStringWithDirectoryINodeParams(0, testDisk));
-//		System.out.println(TesterUtils.buildStringWithINodeParams(0, testDisk));
+//		System.out.println(TesterUtils.buildStringWithDirectoryINodeParams(0, testDisk));
+		System.out.println(TesterUtils.buildStringWithINodeParams(0, testDisk));
 //		TesterUtils.showChars(testDisk);
 	}
 }

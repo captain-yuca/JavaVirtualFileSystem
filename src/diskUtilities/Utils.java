@@ -7,6 +7,9 @@ package diskUtilities;
  * @author Manuel A. Baez Gonzalez
  */
 public class Utils {
+	
+	
+	
 	public static final int INTSIZE = 4; 
 
 	

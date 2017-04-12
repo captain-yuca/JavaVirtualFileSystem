@@ -148,27 +148,36 @@ public class DiskUnit {
 		return this.blockSize;
 	}
 	
-	//TODO: Documentation
+	/**
+	 * Gets the first free block index
+	 */
 	public int getFirstBlockIndex() {
 		return firstBlockIndex;
 	}
 	
-	//TODO:Documentation
+	/**
+	 * Gets the free block index
+	 */
 	public int getFreeBlockIndex() {
 		return freeBlockIndex;
 	}
 	
-	//TODO:Documentation
+	/**
+	 * Gets the first free INode index 
+	 */
 	public int getFirstFreeINodeIndex() {
 		return firstFreeINodeIndex;
 	}
 	
-	//TODO:Documentation
+	/**
+	 * Gets the Total INodes 
+	 */
 	public int getTotalINodes() {
 		return totalINodes;
 	}
 	
 	/**
+	 * Sets the freeBlockIndex
 	 * @param freeBlockIndex the freeBlockIndex to set
 	 */
 	public void setFreeBlockIndex(int freeBlockIndex) {
@@ -177,12 +186,12 @@ public class DiskUnit {
 			this.disk.seek(12);
 			this.disk.writeInt(freeBlockIndex);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
 	/**
+	 * Sets the firstBlockIndex
 	 * @param firstBlockIndex the firstBlockIndex to set
 	 */
 	public void setFirstBlockIndex(int firstBlockIndex) {
@@ -191,7 +200,6 @@ public class DiskUnit {
 			this.disk.seek(8);
 			this.disk.writeInt(firstBlockIndex);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -206,7 +214,6 @@ public class DiskUnit {
 			this.disk.seek(16);
 			this.disk.writeInt(firstFreeINodeIndex);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -345,7 +352,7 @@ public class DiskUnit {
 		}
 	}
 	
-	//TODO: Verify if it needs more Exception since I added more parameters to the method.
+	
 	public static void createDiskUnit(String name, int capacity, int blockSize,int firstBlockIndex, int nextFreeBlockIndex, int firstFreeINodeIndex, int totalINodes)
 			throws ExistingDiskException, InvalidParameterException
 	{
@@ -357,10 +364,10 @@ public class DiskUnit {
 		
 		//UPDATE: Block size must be minimum 32 to acomodate for new parameters
 		if (capacity < 0 || blockSize < 32 ||
-				!Utils.powerOf2(capacity) || !Utils.powerOf2(blockSize))
+				!Utils.powerOf2(capacity) || !Utils.powerOf2(blockSize) || firstBlockIndex==0)
 			throw new InvalidParameterException("Invalid values: " +
 					" capacity = " + capacity + " block size = " +
-					blockSize);
+					blockSize + " first block index = "+ firstBlockIndex);
 		// disk parameters are valid... hence create the file to represent the
 		// disk unit.
 		try {
@@ -409,7 +416,7 @@ public class DiskUnit {
 	}
 	
 	
-	//TODO: Verify if it needs more Exception since I added more parameters to the method.
+	
 
 	/**
 	 * Reserves the specified capacity of blocks with blockSize of the specified parameter.
